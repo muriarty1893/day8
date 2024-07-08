@@ -18,9 +18,9 @@ public class HotelMap : ClassMap<Hotel>
     public HotelMap()
     {
         // CSV dosyasındaki sütun adlarını sınıfın alanlarıyla eşleştir
-        Map(m => m.HotelName).Name("Hotel Names");
-        Map(m => m.FreeParking).Name("Free Parking");
-        Map(m => m.PricePerDay).Name("Price Per Day($)");
+        Map(m => m.HotelName).Name("HotelName");
+        Map(m => m.FreeParking).Name("FreeParking");
+        Map(m => m.PricePerDay).Name("PricePerDay");
     }
 }
 
