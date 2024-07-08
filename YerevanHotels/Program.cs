@@ -71,22 +71,32 @@ public class Program
     // Elasticsearch'te bir arama sorgusu çalıştırır ve sonuçları ekrana yazar
     private static void SearchHotels(ElasticClient client, string searchText)
     {
-        var searchResponse = client.Search<Hotel>(s => s
-            .Query(q => q
-                .Match(m => m
-                    .Field(f => f.HotelName)
-                    .Query(searchText)
-                )
-            )
-        );
-
-        foreach (var hotel in searchResponse.Documents)
+        try
         {
-            Console.WriteLine($"Hotel: {hotel.HotelName}, Price: {hotel.PricePerDay}, Free Parking: {hotel.FreeParking}");
+            var searchResponse = client.Search<Hotel>(s => s
+                .Query(q => q
+                    .Fuzzy(fz => fz
+                        .Field(f => f.HotelName)
+                        .Value(searchText)
+                        .Fuzziness(Fuzziness.Auto)
+                    )
+                )
+            );
+
+            foreach (var hotel in searchResponse.Documents)
+            {
+                Console.WriteLine($"Hotel: {hotel.HotelName}, Price: {hotel.PricePerDay}, Free Parking: {hotel.FreeParking}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+            Console.WriteLine("Stack Trace:");
+            Console.WriteLine(ex.StackTrace);
         }
     }
 
-    public static void Main(string[] args)
+        public static void Main(string[] args)
     {
         var filePath = "oteller.csv";
         var hotels = ReadCsv(filePath); // CSV dosyasını oku
@@ -100,6 +110,6 @@ public class Program
         IndexHotels(client, hotels);
 
         // Otelleri ara ve sonuçları ekrana yazdır
-        SearchHotels(client, "Hostel");
+        SearchHotels(client, "Royal Boutique");
     }
 }
