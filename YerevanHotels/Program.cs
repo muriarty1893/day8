@@ -1,120 +1,71 @@
 ﻿using System;
-using System.Globalization;
+using System.Collections.Generic;
 using System.IO;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Nest;
-using Newtonsoft.Json;  // JSON dönüştürme işlemleri için gerekli kütüphane
 
-class Program
+public class Hotel
 {
-    public class Hotel
-    {
-        public string? HotelNames { get; set; }
-        public string? FreeParking { get; set; }
-        public double PricePerDay { get; set; }
-    }
+    public string? HotelName { get; set; }
+    public string? FreeParking { get; set; }
+    public decimal PricePerDay { get; set; }
+}
 
-    public sealed class HotelMap : ClassMap<Hotel>
-    {
-        public HotelMap()
-        {
-            Map(m => m.HotelNames).Name("Hotel Names");
-            Map(m => m.FreeParking).Name("Free Parking");
-            Map(m => m.PricePerDay).Name("Price Per Day($)");
-        }
-    }
-
-    static void Main(string[] args)
+public class Program
+{
+    private static ElasticClient CreateElasticClient()
     {
         var settings = new ConnectionSettings(new Uri("http://localhost:9200"))
             .DefaultIndex("hotels");
+        return new ElasticClient(settings);
+    }
 
-        var client = new ElasticClient(settings);
-
-        // Mevcut indeksi sil
-        var deleteIndexResponse = client.Indices.Delete("hotels");
-
-        if (!deleteIndexResponse.IsValid && !deleteIndexResponse.ApiCall.Success)
+    private static List<Hotel> ReadCsv(string filePath)
+    {
+        using (var reader = new StreamReader(filePath))
+        using (var csv = new CsvReader(reader, new CsvConfiguration(System.Globalization.CultureInfo.InvariantCulture)))
         {
-            Console.WriteLine($"ElasticSearch Error: {deleteIndexResponse.ServerError?.Error?.Reason}");
-            return;
+            return new List<Hotel>(csv.GetRecords<Hotel>());
         }
-        Console.WriteLine("Index deleted.");
+    }
 
-        // Yeni bir indeks oluştur
-        var createIndexResponse = client.Indices.Create("hotels", c => c
-            .Map<Hotel>(m => m
-                .AutoMap()
-            )
-        );
-
-        if (!createIndexResponse.IsValid)
+    private static void IndexHotels(ElasticClient client, List<Hotel> hotels)
+    {
+        foreach (var hotel in hotels)
         {
-            Console.WriteLine($"ElasticSearch Error: {createIndexResponse.ServerError?.Error?.Reason}");
-            return;
+            client.IndexDocument(hotel);
         }
-        Console.WriteLine("Index created.");
+    }
 
-        // CSV dosyasını okuma ve Elasticsearch'e yükleme
-        var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-        {
-            MissingFieldFound = null, // Eksik alanları yok say
-            BadDataFound = context => { /* Hatalı verileri işleme */ },
-        };
-
-        using (var reader = new StreamReader(@"C:\Users\Murat Eker\Desktop\day8-3\YerevanHotels\oteller.csv"))
-        using (var csv = new CsvReader(reader, config))
-        {
-            csv.Context.RegisterClassMap<HotelMap>(); // ClassMap'i kaydet
-
-            var records = csv.GetRecords<Hotel>().ToList();  // Tüm kayıtları listeye al
-
-            foreach (var record in records)
-            {
-                var json = JsonConvert.SerializeObject(record);
-                Console.WriteLine($"JSON: {json}");
-
-                var response = client.Index<Hotel>(record, idx => idx
-                    .Index("hotels")
-                    .Id(record.HotelNames)  // HotelNames'ı benzersiz bir ID olarak kullan
-                );
-                if (!response.IsValid)
-                {
-                    Console.WriteLine($"ElasticSearch Error: {response.ServerError?.Error?.Reason}");
-                }
-                else
-                {
-                    Console.WriteLine($"Indexed: {record.HotelNames}");
-                }
-            }
-        }
-
-        // Verilerin Elasticsearch’e yüklenip yüklenmediğini kontrol et
-        var countResponse = client.Count<Hotel>(c => c
-            .Index("hotels")
-        );
-
-        Console.WriteLine($"Total Documents in Index: {countResponse.Count}");
-
-        // Basit bir arama sorgusu örneği
+    private static void SearchHotels(ElasticClient client, string searchText)
+    {
         var searchResponse = client.Search<Hotel>(s => s
             .Query(q => q
                 .Match(m => m
-                    .Field(f => f.HotelNames)
-                    .Query("Kenut Hostel")  // Bu örnekte Kenut Hostel ismi ile arama yapıyoruz
+                    .Field(f => f.HotelName)
+                    .Query(searchText)
                 )
-            )       
+            )
         );
 
-        Console.WriteLine($"Total Hits: {searchResponse.Total}");
-
-        foreach (var hit in searchResponse.Hits)
+        foreach (var hotel in searchResponse.Documents)
         {
-            Console.WriteLine($"Hotel: {hit.Source.HotelNames}, Free Parking: {hit.Source.FreeParking}, Price Per Day: ${hit.Source.PricePerDay}");
+            Console.WriteLine($"Hotel: {hotel.HotelName}, Price: {hotel.PricePerDay}, Free Parking: {hotel.FreeParking}");
         }
-
-        // İndeks ve Mapping ayarlarını kontrol etme  
     }
-    
+
+    public static void Main(string[] args)
+    {
+        var filePath = "oteller.csv";
+        var hotels = ReadCsv(filePath);
+
+        var client = CreateElasticClient();
+
+        // Index hotels
+        IndexHotels(client, hotels);
+
+        // Search hotels
+        SearchHotels(client, "Kantar");
+    }
 }
