@@ -42,8 +42,7 @@ class Program
             Console.WriteLine($"ElasticSearch Error: {deleteIndexResponse.ServerError?.Error?.Reason}");
             return;
         }
-
-        // Yeni bir indeks oluştur
+        // Yeni bir indeks oluştur (opsiyonel, genellikle otomatik olarak yapılır)
         var createIndexResponse = client.Indices.Create("hotels", c => c
             .Map<Hotel>(m => m
                 .AutoMap()
@@ -63,7 +62,7 @@ class Program
             BadDataFound = context => { /* Hatalı verileri işleme */ },
         };
 
-        using (var reader = new StreamReader("oteller.csv"))
+        using (var reader = new StreamReader(@"C:\Users\Murat Eker\Desktop\day8-3\YerevanHotels\oteller.csv"))  // Burada dosya konumunu belirtiyoruz
         using (var csv = new CsvReader(reader, config))
         {
             csv.Context.RegisterClassMap<HotelMap>(); // ClassMap'i kaydet
@@ -87,10 +86,10 @@ class Program
                     .Field(f => f.HotelNames)
                     .Query("hostel")
                 )
-            )
+            )       
         );
 
-        Console.WriteLine($"Total Hits: {searchResponse.Total}");
+        Console.WriteLine($"Total Documents in Index: {searchResponse.Total}");
 
         foreach (var hit in searchResponse.Hits)
         {
