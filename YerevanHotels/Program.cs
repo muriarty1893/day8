@@ -110,6 +110,6 @@ public class Program
         IndexHotels(client, hotels);
 
         // Otelleri ara ve sonuçları ekrana yazdır
-        SearchHotels(client, "Royal Boutique");
+        SearchHotels(client, "seasos");
     }
 }
