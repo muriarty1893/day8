@@ -6,24 +6,53 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using CsvHelper.Configuration.Attributes;
 using System.Globalization;
-using System.Linq;
 
 namespace ElasticsearchExample2
 {
     // FinancialData sınıfı, CSV dosyasındaki verilerin yapısını temsil eder
     public class FinancialData
     {
-        [Name("Company Name")]
-        public string CompanyName { get; set; }
+        [Name("Series_reference")]
+        public string SeriesReference { get; set; }
 
-        [Name("Revenue")]
-        public double Revenue { get; set; }
+        [Name("Period")]
+        public string Period { get; set; }
 
-        [Name("Profit")]
-        public double Profit { get; set; }
+        [Name("Data_value")]
+        public decimal DataValue { get; set; }
 
-        [Name("Year")]
-        public int Year { get; set; }
+        [Name("Suppressed")]
+        public string Suppressed { get; set; }
+
+        [Name("STATUS")]
+        public string Status { get; set; }
+
+        [Name("UNITS")]
+        public string Units { get; set; }
+
+        [Name("Magnitude")]
+        public int Magnitude { get; set; }
+
+        [Name("Subject")]
+        public string Subject { get; set; }
+
+        [Name("Group")]
+        public string Group { get; set; }
+
+        [Name("Series_title_1")]
+        public string SeriesTitle1 { get; set; }
+
+        [Name("Series_title_2")]
+        public string SeriesTitle2 { get; set; }
+
+        [Name("Series_title_3")]
+        public string SeriesTitle3 { get; set; }
+
+        [Name("Series_title_4")]
+        public string SeriesTitle4 { get; set; }
+
+        [Name("Series_title_5")]
+        public string SeriesTitle5 { get; set; }
     }
 
     class Program
@@ -48,24 +77,67 @@ namespace ElasticsearchExample2
                             .AutoMap()
                             .Properties(ps => ps
                                 .Text(t => t
-                                    .Name(fd => fd.CompanyName)
+                                    .Name(n => n.SeriesReference)
                                     .Analyzer("standard")
                                 )
-                                .Number(t => t
-                                    .Name(fd => fd.Revenue)
+                                .Text(t => t
+                                    .Name(n => n.Period)
+                                    .Analyzer("standard")
                                 )
-                                .Number(t => t
-                                    .Name(fd => fd.Profit)
+                                .Number(n => n
+                                    .Name(n => n.DataValue)
+                                    .Type(NumberType.Double)
                                 )
-                                .Number(t => t
-                                    .Name(fd => fd.Year)
+                                .Text(t => t
+                                    .Name(n => n.Suppressed)
+                                    .Analyzer("standard")
+                                )
+                                .Text(t => t
+                                    .Name(n => n.Status)
+                                    .Analyzer("standard")
+                                )
+                                .Text(t => t
+                                    .Name(n => n.Units)
+                                    .Analyzer("standard")
+                                )
+                                .Number(n => n
+                                    .Name(n => n.Magnitude)
+                                    .Type(NumberType.Integer)
+                                )
+                                .Text(t => t
+                                    .Name(n => n.Subject)
+                                    .Analyzer("standard")
+                                )
+                                .Text(t => t
+                                    .Name(n => n.Group)
+                                    .Analyzer("standard")
+                                )
+                                .Text(t => t
+                                    .Name(n => n.SeriesTitle1)
+                                    .Analyzer("standard")
+                                )
+                                .Text(t => t
+                                    .Name(n => n.SeriesTitle2)
+                                    .Analyzer("standard")
+                                )
+                                .Text(t => t
+                                    .Name(n => n.SeriesTitle3)
+                                    .Analyzer("standard")
+                                )
+                                .Text(t => t
+                                    .Name(n => n.SeriesTitle4)
+                                    .Analyzer("standard")
+                                )
+                                .Text(t => t
+                                    .Name(n => n.SeriesTitle5)
+                                    .Analyzer("standard")
                                 )
                             )
                         )
                     );
                 }
 
-                // CSV dosyasını oku ve boş satırları kaldır
+                // CSV dosyasını oku
                 using (var reader = new StreamReader(@"C:\Users\Murat Eker\Desktop\day8\business-financial-data-march-2024-csv.csv"))
                 using (var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
@@ -73,13 +145,8 @@ namespace ElasticsearchExample2
                     MissingFieldFound = null, // Eksik alan bulunursa hata vermemek için
                 }))
                 {
-                    var records = csv.GetRecords<FinancialData>().Where(record =>
-                        !string.IsNullOrWhiteSpace(record.CompanyName) &&
-                        record.Revenue != 0 &&
-                        record.Profit != 0 &&
-                        record.Year != 0
-                    ).ToList();
-
+                    // CSV verilerini FinancialData nesnelerine dönüştür
+                    var records = csv.GetRecords<FinancialData>();
                     // Verileri Elasticsearch'e yükle
                     var indexResponse = client.IndexMany(records);
 
@@ -99,7 +166,7 @@ namespace ElasticsearchExample2
                 var searchResponse = client.Search<FinancialData>(s => s
                     .Query(q => q
                         .QueryString(qs => qs
-                            .Query("Business") // Aranacak kelimeyi buraya yazın
+                            .Query("reap") // Aranacak kelimeyi buraya yazın
                         )
                     )
                 );
@@ -120,12 +187,12 @@ namespace ElasticsearchExample2
                 {
                     foreach (var hit in searchResponse.Hits)
                     {
-                        Console.WriteLine($"{hit.Source.CompanyName} - {hit.Source.Revenue} - {hit.Source.Profit} - {hit.Source.Year}");
+                        Console.WriteLine($"{hit.Source.SeriesReference} - {hit.Source.Period} - {hit.Source.DataValue}");
                     }
                 }
 
                 // Anında cmd den çıkmasın diye
-                Console.WriteLine("Bir tuş  a basın çıkmak için...");
+                Console.WriteLine("Bir tuşa basın çıkmak için...");
                 Console.ReadLine(); // Programın kapanmasını engellemek için eklenen satır
             }
             catch (Exception ex)
