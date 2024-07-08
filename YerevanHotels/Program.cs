@@ -7,7 +7,6 @@ using Nest;
 
 class Program
 {
-    // Hotel sınıfını CSV dosyasına uygun şekilde güncelleyelim
     public class Hotel
     {
         public string? HotelNames { get; set; }
@@ -15,7 +14,6 @@ class Program
         public double PricePerDay { get; set; }
     }
 
-    // Hotel sınıfı için CSV yapılandırması
     public sealed class HotelMap : ClassMap<Hotel>
     {
         public HotelMap()
@@ -28,7 +26,6 @@ class Program
 
     static void Main(string[] args)
     {
-        // Elasticsearch yapılandırması
         var settings = new ConnectionSettings(new Uri("http://localhost:9200"))
             .DefaultIndex("hotels");
 
@@ -42,7 +39,9 @@ class Program
             Console.WriteLine($"ElasticSearch Error: {deleteIndexResponse.ServerError?.Error?.Reason}");
             return;
         }
-        // Yeni bir indeks oluştur (opsiyonel, genellikle otomatik olarak yapılır)
+        Console.WriteLine("Index deleted.");
+
+        // Yeni bir indeks oluştur
         var createIndexResponse = client.Indices.Create("hotels", c => c
             .Map<Hotel>(m => m
                 .AutoMap()
@@ -54,6 +53,7 @@ class Program
             Console.WriteLine($"ElasticSearch Error: {createIndexResponse.ServerError?.Error?.Reason}");
             return;
         }
+        Console.WriteLine("Index created.");
 
         // CSV dosyasını okuma ve Elasticsearch'e yükleme
         var config = new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -62,12 +62,12 @@ class Program
             BadDataFound = context => { /* Hatalı verileri işleme */ },
         };
 
-        using (var reader = new StreamReader(@"C:\Users\Murat Eker\Desktop\day8-3\YerevanHotels\oteller.csv"))  // Burada dosya konumunu belirtiyoruz
+        using (var reader = new StreamReader(@"C:\Users\Murat Eker\Desktop\day8-3\YerevanHotels\oteller.csv"))
         using (var csv = new CsvReader(reader, config))
         {
             csv.Context.RegisterClassMap<HotelMap>(); // ClassMap'i kaydet
 
-            var records = csv.GetRecords<Hotel>();
+            var records = csv.GetRecords<Hotel>().ToList();  // Tüm kayıtları listeye al
 
             foreach (var record in records)
             {
@@ -79,6 +79,13 @@ class Program
             }
         }
 
+        // Verilerin Elasticsearch'e yüklenip yüklenmediğini kontrol et
+        var countResponse = client.Count<Hotel>(c => c
+            .Index("hotels")
+        );
+
+        Console.WriteLine($"Total Documents in Index: {countResponse.Count}");
+
         // Basit bir arama sorgusu örneği
         var searchResponse = client.Search<Hotel>(s => s
             .Query(q => q
@@ -89,7 +96,7 @@ class Program
             )       
         );
 
-        Console.WriteLine($"Total Documents in Index: {searchResponse.Total}");
+        Console.WriteLine($"Total Hits: {searchResponse.Total}");
 
         foreach (var hit in searchResponse.Hits)
         {
