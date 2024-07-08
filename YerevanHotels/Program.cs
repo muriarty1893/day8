@@ -8,8 +8,8 @@ using Nest;
 
 public class Hotel
 {
-    public string HotelName { get; set; }
-    public string FreeParking { get; set; }
+    public string? HotelName { get; set; }
+    public string? FreeParking { get; set; }
     public decimal PricePerDay { get; set; }
 }
 
