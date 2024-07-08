@@ -7,6 +7,7 @@ using Nest;
 
 class Program
 {
+    // Hotel sınıfını CSV dosyasına uygun şekilde güncelleyelim
     public class Hotel
     {
         public string? HotelNames { get; set; }
@@ -14,6 +15,7 @@ class Program
         public double PricePerDay { get; set; }
     }
 
+    // Hotel sınıfı için CSV yapılandırması
     public sealed class HotelMap : ClassMap<Hotel>
     {
         public HotelMap()
@@ -26,11 +28,13 @@ class Program
 
     static void Main(string[] args)
     {
+        // Elasticsearch yapılandırması
         var settings = new ConnectionSettings(new Uri("http://localhost:9200"))
             .DefaultIndex("hotels");
 
         var client = new ElasticClient(settings);
 
+        // Mevcut indeksi sil
         var deleteIndexResponse = client.Indices.Delete("hotels");
 
         if (!deleteIndexResponse.IsValid && !deleteIndexResponse.ApiCall.Success)
@@ -39,16 +43,30 @@ class Program
             return;
         }
 
+        // Yeni bir indeks oluştur
+        var createIndexResponse = client.Indices.Create("hotels", c => c
+            .Map<Hotel>(m => m
+                .AutoMap()
+            )
+        );
+
+        if (!createIndexResponse.IsValid)
+        {
+            Console.WriteLine($"ElasticSearch Error: {createIndexResponse.ServerError?.Error?.Reason}");
+            return;
+        }
+
+        // CSV dosyasını okuma ve Elasticsearch'e yükleme
         var config = new CsvConfiguration(CultureInfo.InvariantCulture)
         {
-            MissingFieldFound = null,
+            MissingFieldFound = null, // Eksik alanları yok say
             BadDataFound = context => { /* Hatalı verileri işleme */ },
         };
 
         using (var reader = new StreamReader("oteller.csv"))
         using (var csv = new CsvReader(reader, config))
         {
-            csv.Context.RegisterClassMap<HotelMap>();
+            csv.Context.RegisterClassMap<HotelMap>(); // ClassMap'i kaydet
 
             var records = csv.GetRecords<Hotel>();
 
@@ -62,11 +80,12 @@ class Program
             }
         }
 
+        // Basit bir arama sorgusu örneği
         var searchResponse = client.Search<Hotel>(s => s
             .Query(q => q
                 .Match(m => m
                     .Field(f => f.HotelNames)
-                    .Query(" Boutique ")
+                    .Query("hostel")
                 )
             )
         );
