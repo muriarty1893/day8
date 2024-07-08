@@ -19,7 +19,7 @@ namespace ElasticsearchExample2
         public string Period { get; set; }
 
         [Name("Data_value")]
-        public decimal DataValue { get; set; }
+        public double DataValue { get; set; }
 
         [Name("Suppressed")]
         public string Suppressed { get; set; }
@@ -31,7 +31,7 @@ namespace ElasticsearchExample2
         public string Units { get; set; }
 
         [Name("Magnitude")]
-        public int Magnitude { get; set; }
+        public double Magnitude { get; set; }
 
         [Name("Subject")]
         public string Subject { get; set; }
@@ -76,60 +76,60 @@ namespace ElasticsearchExample2
                         .Map<FinancialData>(m => m
                             .AutoMap()
                             .Properties(ps => ps
-                                .Text(t => t
-                                    .Name(n => n.SeriesReference)
+                                .Text(t1 => t1
+                                    .Name(n1 => n1.SeriesReference)
                                     .Analyzer("standard")
                                 )
-                                .Text(t => t
-                                    .Name(n => n.Period)
+                                .Text(t1 => t1
+                                    .Name(n1 => n1.Period)
                                     .Analyzer("standard")
                                 )
-                                .Number(n => n
-                                    .Name(n => n.DataValue)
+                                .Number(n2 => n2
+                                    .Name(n3 => n3.DataValue)
                                     .Type(NumberType.Double)
                                 )
-                                .Text(t => t
-                                    .Name(n => n.Suppressed)
+                                .Text(t1 => t1
+                                    .Name(n1 => n1.Suppressed)
                                     .Analyzer("standard")
                                 )
-                                .Text(t => t
-                                    .Name(n => n.Status)
+                                .Text(t1 => t1
+                                    .Name(n1 => n1.Status)
                                     .Analyzer("standard")
                                 )
-                                .Text(t => t
-                                    .Name(n => n.Units)
+                                .Text(t1 => t1
+                                    .Name(n1 => n1.Units)
                                     .Analyzer("standard")
                                 )
-                                .Number(n => n
-                                    .Name(n => n.Magnitude)
+                                .Number(n2 => n2
+                                    .Name(n3 => n3.Magnitude)
                                     .Type(NumberType.Integer)
                                 )
-                                .Text(t => t
-                                    .Name(n => n.Subject)
+                                .Text(t1 => t1
+                                    .Name(n1 => n1.Subject)
                                     .Analyzer("standard")
                                 )
-                                .Text(t => t
-                                    .Name(n => n.Group)
+                                .Text(t1 => t1
+                                    .Name(n1 => n1.Group)
                                     .Analyzer("standard")
                                 )
-                                .Text(t => t
-                                    .Name(n => n.SeriesTitle1)
+                                .Text(t1 => t1
+                                    .Name(n1 => n1.SeriesTitle1)
                                     .Analyzer("standard")
                                 )
-                                .Text(t => t
-                                    .Name(n => n.SeriesTitle2)
+                                .Text(t1 => t1
+                                    .Name(n1 => n1.SeriesTitle2)
                                     .Analyzer("standard")
                                 )
-                                .Text(t => t
-                                    .Name(n => n.SeriesTitle3)
+                                .Text(t1 => t1
+                                    .Name(n1 => n1.SeriesTitle3)
                                     .Analyzer("standard")
                                 )
-                                .Text(t => t
-                                    .Name(n => n.SeriesTitle4)
+                                .Text(t1 => t1
+                                    .Name(n1 => n1.SeriesTitle4)
                                     .Analyzer("standard")
                                 )
-                                .Text(t => t
-                                    .Name(n => n.SeriesTitle5)
+                                .Text(t1 => t1
+                                    .Name(n1 => n1.SeriesTitle5)
                                     .Analyzer("standard")
                                 )
                             )
