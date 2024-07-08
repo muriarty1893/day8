@@ -66,7 +66,7 @@ namespace ElasticsearchExample2
                 }
 
                 // CSV dosyasını oku ve boş satırları kaldır
-                using (var reader = new StreamReader("business-financial-data-march-2024-csv.csv"))
+                using (var reader = new StreamReader(@"C:\Users\Murat Eker\Desktop\day8\business-financial-data-march-2024-csv.csv"))
                 using (var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
                     HeaderValidated = null, // Başlık doğrulamasını devre dışı bırak
