@@ -100,6 +100,6 @@ public class Program
         IndexHotels(client, hotels);
 
         // Otelleri ara ve sonuçları ekrana yazdır
-        SearchHotels(client, "Kenut");
+        SearchHotels(client, "Hostel");
     }
 }
