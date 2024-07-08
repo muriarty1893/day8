@@ -85,7 +85,7 @@ public class Program
 
             foreach (var hotel in searchResponse.Documents)
             {
-                Console.WriteLine($"Hotel: {hotel.HotelName}, Price: {hotel.PricePerDay}, Free Parking: {hotel.FreeParking}");
+                Console.WriteLine($"Hotel: {hotel.HotelName},\nPrice: {hotel.PricePerDay},\nFree Parking: {hotel.FreeParking}");
             }
         }
         catch (Exception ex)
@@ -110,6 +110,6 @@ public class Program
         IndexHotels(client, hotels);
 
         // Otelleri ara ve sonuçları ekrana yazdır
-        SearchHotels(client, "seasos");
+        SearchHotels(client, "swee");
     }
 }
