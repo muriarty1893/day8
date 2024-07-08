@@ -4,6 +4,7 @@ using System.IO;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Nest;
+using Newtonsoft.Json;  // JSON dönüştürme işlemleri için gerekli kütüphane
 
 class Program
 {
@@ -71,15 +72,25 @@ class Program
 
             foreach (var record in records)
             {
-                var response = client.IndexDocument(record);
+                var json = JsonConvert.SerializeObject(record);
+                Console.WriteLine($"JSON: {json}");
+
+                var response = client.Index<Hotel>(record, idx => idx
+                    .Index("hotels")
+                    .Id(record.HotelNames)  // HotelNames'ı benzersiz bir ID olarak kullan
+                );
                 if (!response.IsValid)
                 {
                     Console.WriteLine($"ElasticSearch Error: {response.ServerError?.Error?.Reason}");
                 }
+                else
+                {
+                    Console.WriteLine($"Indexed: {record.HotelNames}");
+                }
             }
         }
 
-        // Verilerin Elasticsearch'e yüklenip yüklenmediğini kontrol et
+        // Verilerin Elasticsearch’e yüklenip yüklenmediğini kontrol et
         var countResponse = client.Count<Hotel>(c => c
             .Index("hotels")
         );
@@ -91,7 +102,7 @@ class Program
             .Query(q => q
                 .Match(m => m
                     .Field(f => f.HotelNames)
-                    .Query("hostel")
+                    .Query("Kenut Hostel")  // Bu örnekte Kenut Hostel ismi ile arama yapıyoruz
                 )
             )       
         );
@@ -102,5 +113,8 @@ class Program
         {
             Console.WriteLine($"Hotel: {hit.Source.HotelNames}, Free Parking: {hit.Source.FreeParking}, Price Per Day: ${hit.Source.PricePerDay}");
         }
+
+        // İndeks ve Mapping ayarlarını kontrol etme  
     }
+    
 }
