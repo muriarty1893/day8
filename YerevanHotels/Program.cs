@@ -110,6 +110,6 @@ public class Program
         IndexHotels(client, hotels);
 
         // Otelleri ara ve sonuçları ekrana yazdır
-        SearchHotels(client, "wee"); // ENTER THE TEXT HERE ------------------------------------------------------------------
+        SearchHotels(client, "Sweet"); // ENTER THE TEXT HERE ------------------------------------------------------------------
     }
 }
