@@ -20,19 +20,19 @@ public class Product
     public string? Barcode { get; set; }
     public bool FlagStockOption { get; set; }
     public int StockLimitId { get; set; }
-    public int ProductSizeId { get; set; }
+    public int? ProductSizeId { get; set; }
     public string? Description { get; set; }
     public string? ShortDescription { get; set; }
-    public bool FlagPriceOption { get; set; }
+    public bool? FlagPriceOption { get; set; }
     public string? ProductContent { get; set; }
     public int ProductTypeId { get; set; }
-    public int MetaId { get; set; }
+    public int? MetaId { get; set; }
     public string? ImportName { get; set; }
-    public int TaxId { get; set; }
+    public int? TaxId { get; set; }
     public string? SerialNo { get; set; }
     public int ProductBranchId { get; set; }
     public int CompanyId { get; set; }
-    public int StokQuantity { get; set; }
+    public int? StokQuantity { get; set; }
     public decimal TaxTotal { get; set; }
     public decimal ItemPrice { get; set; }
     public decimal RegularPrice { get; set; }
