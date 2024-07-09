@@ -9,43 +9,43 @@ using Nest;
 
 public class Product
 {
-    public int ProductId { get; set; }
+    public int? ProductId { get; set; }
     public string? ProductName { get; set; }
     public string? StockCode { get; set; }
-    public int StockUnit { get; set; }
-    public DateTime CreatedDate { get; set; }
-    public DateTime ReleaseDate { get; set; }
+    public int? StockUnit { get; set; }
+    public DateTime? CreatedDate { get; set; }
+    public DateTime? ReleaseDate { get; set; }
     public string? ProductJson { get; set; }
-    public int ProductStateId { get; set; }
+    public int? ProductStateId { get; set; }
     public string? Barcode { get; set; }
-    public bool FlagStockOption { get; set; }
-    public int StockLimitId { get; set; }
+    public bool? FlagStockOption { get; set; }
+    public int? StockLimitId { get; set; }
     public int? ProductSizeId { get; set; }
     public string? Description { get; set; }
     public string? ShortDescription { get; set; }
     public bool? FlagPriceOption { get; set; }
     public string? ProductContent { get; set; }
-    public int ProductTypeId { get; set; }
+    public int? ProductTypeId { get; set; }
     public int? MetaId { get; set; }
     public string? ImportName { get; set; }
     public int? TaxId { get; set; }
     public string? SerialNo { get; set; }
-    public int ProductBranchId { get; set; }
-    public int CompanyId { get; set; }
+    public int? ProductBranchId { get; set; }
+    public int? CompanyId { get; set; }
     public int? StokQuantity { get; set; }
-    public decimal TaxTotal { get; set; }
-    public decimal ItemPrice { get; set; }
-    public decimal RegularPrice { get; set; }
-    public bool SaleFlag { get; set; }
-    public decimal OldPrice { get; set; }
-    public bool FlagStockManage { get; set; }
+    public decimal? TaxTotal { get; set; }
+    public decimal? ItemPrice { get; set; }
+    public decimal? RegularPrice { get; set; }
+    public bool? SaleFlag { get; set; }
+    public decimal? OldPrice { get; set; }
+    public bool? FlagStockManage { get; set; }
     public string? SaleTag { get; set; }
-    public bool FlagStockOnline { get; set; }
-    public bool FlagOnStock { get; set; }
-    public bool FlagActive { get; set; }
-    public bool FlagLock { get; set; }
-    public int CurrencyId { get; set; }
-    public decimal PurchasePrice { get; set; }
+    public bool? FlagStockOnline { get; set; }
+    public bool? FlagOnStock { get; set; }
+    public bool? FlagActive { get; set; }
+    public bool? FlagLock { get; set; }
+    public int? CurrencyId { get; set; }
+    public decimal? PurchasePrice { get; set; }
 }
 
 public class ProductMap : ClassMap<Product>
