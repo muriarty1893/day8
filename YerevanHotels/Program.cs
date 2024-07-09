@@ -185,6 +185,6 @@ public class Program
 
         IndexProducts(client, products);
 
-        SearchProducts(client, "TANG"); // ENTER THE TEXT HERE
+        SearchProducts(client, "PORTAKAL"); // ENTER THE TEXT HERE
     }
 }
