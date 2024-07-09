@@ -140,8 +140,8 @@ public class Program
     {
         try
         {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
+            
+            //stopwatch.Start();
 
             // Verilen metinle eşleşen ürünleri Elasticsearch'te arar.
             var searchResponse = client.Search<Product>(s => s
@@ -160,8 +160,8 @@ public class Program
                 )
             );
 
-            stopwatch.Stop();
-            Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms");
+            //stopwatch.Stop();
+            //Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms");
 
             int counter = 0;
             foreach (var product in searchResponse.Documents)
@@ -189,7 +189,12 @@ public class Program
         DeleteProducts(client); // Elasticsearch'ten mevcut tüm ürünleri siler
 
         IndexProducts(client, products); // CSV'den okunan ürünleri Elasticsearch'e indeksler
-
+        
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
         SearchProducts(client, "PORTAKAL"); // Elasticsearch'te girilen kelimeyi arar -------------------------------------------------------------
+        stopwatch.Stop();
+        Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms");
+
     }
 }
