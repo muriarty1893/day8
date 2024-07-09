@@ -198,7 +198,7 @@ public class Program
         DeleteProducts(client, logger); // Elasticsearch'ten mevcut tüm ürünleri siler
         IndexProducts(client, products, logger); // CSV'den okunan ürünleri Elasticsearch'e indeksler
         
-        SearchProducts(client, "içekek", logger); // Elasticsearch'te girilen kelimeyi arar
+        SearchProducts(client, "içecek", logger); // Elasticsearch'te girilen kelimeyi arar
         stopwatch.Stop();
         Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms");
     }
