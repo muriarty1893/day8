@@ -138,45 +138,32 @@ public class Program
 
     private static void SearchProducts(ElasticClient client, string searchText)
     {
-        try
-        {
-            
-            //stopwatch.Start();
-
-            // Verilen metinle eşleşen ürünleri Elasticsearch'te arar.
-            var searchResponse = client.Search<Product>(s => s
-                .Query(q => q
-                    .MultiMatch(mm => mm
-                        .Query(searchText)
-                        .Fields(f => f
-                            .Field(p => p.ProductName, 3.0) // Ürün adına ağırlık verir.
-                            .Field(p => p.Description)     // Açıklamaya göre arar.
-                        )
-                        .Fuzziness(Fuzziness.Auto)       // Otomatik bulanıklık ayarı.
+    
+        // Verilen metinle eşleşen ürünleri Elasticsearch'te arar.
+        var searchResponse = client.Search<Product>(s => s
+            .Query(q => q
+                .MultiMatch(mm => mm
+                    .Query(searchText)
+                    .Fields(f => f
+                        .Field(p => p.ProductName, 3.0) // Ürün adına ağırlık verir.
+                        .Field(p => p.Description)     // Açıklamaya göre arar.
                     )
+                    .Fuzziness(Fuzziness.Auto)       // Otomatik bulanıklık ayarı.
                 )
-                .Sort(srt => srt
-                    .Descending(SortSpecialField.Score) // Sonuçları puan sırasına göre sıralar.
-                )
-            );
+            )
+            .Sort(srt => srt
+                .Descending(SortSpecialField.Score) // Sonuçları puan sırasına göre sıralar.
+            )
+        );
 
-            //stopwatch.Stop();
-            //Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms");
-
-            int counter = 0;
-            foreach (var product in searchResponse.Documents)
-            {
-                if (counter >= 6) { break; } // En fazla 6 ürünü yazdırır.
-                Console.WriteLine($"Product: {product.ProductName},\nPrice: {product.RegularPrice},\nStock Quantity: {product.StokQuantity}");
-                counter++;
-            }
-        }
-        catch (Exception ex)
+        int counter = 0;
+        foreach (var product in searchResponse.Documents)
         {
-            Console.WriteLine($"An error occurred: {ex.Message}");
-            Console.WriteLine("Stack Trace:");
-            Console.WriteLine(ex.StackTrace);
+            if (counter >= 6) { break; } // En fazla 6 ürünü yazdırması için.
+            Console.WriteLine($"Product: {product.ProductName},\nPrice: {product.RegularPrice},\nStock Quantity: {product.StokQuantity}");
+            counter++;
         }
+
     }
 
     public static void Main(string[] args)
@@ -192,8 +179,7 @@ public class Program
         DeleteProducts(client); // Elasticsearch'ten mevcut tüm ürünleri siler
         IndexProducts(client, products); // CSV'den okunan ürünleri Elasticsearch'e indeksler
         
-        
-        SearchProducts(client, "PORTAKAL"); // Elasticsearch'te girilen kelimeyi arar -------------------------------------------------------------
+        SearchProducts(client, "toz"); // Elasticsearch'te girilen kelimeyi arar -------------------------------------------------------------
         stopwatch.Stop();
         Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms");
 
