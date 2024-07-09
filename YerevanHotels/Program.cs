@@ -9,6 +9,7 @@ using Nest;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Logging.Debug;
+
 public class Product
 {
     public double? ProductId { get; set; }
@@ -93,19 +94,92 @@ public class ProductMap : ClassMap<Product>
         Map(m => m.PurchasePrice).Name("purchasePrice");
     }
 }
+
 public class Program
 {
     private static ElasticClient CreateElasticClient()
     {
-        // Elasticsearch bağlantı ayarlarını yapılandırır ve bir ElasticClient döndürür.
         var settings = new ConnectionSettings(new Uri("http://localhost:9200"))
             .DefaultIndex("products");
-        return new ElasticClient(settings);
+        var client = new ElasticClient(settings);
+
+        // Index oluştur ve ngram analyzer ekle
+        CreateIndexWithNgramAnalyzer(client);
+
+        return client;
+    }
+
+    private static void CreateIndexWithNgramAnalyzer(ElasticClient client)
+    {
+        var deleteResponse = client.Indices.Delete("products");
+
+        if (!deleteResponse.IsValid && deleteResponse.ServerError.Error.Type != "index_not_found_exception")
+        {
+            throw new Exception($"Failed to delete existing index: {deleteResponse.ServerError}");
+        }
+
+        var createIndexResponse = client.Indices.Create("products", c => c
+            .Settings(s => s
+                .Analysis(a => a
+                    .Tokenizers(t => t
+                        .NGram("ngram_tokenizer", ngt => ngt
+                            .MinGram(3)
+                            .MaxGram(4)
+                            .TokenChars(TokenChar.Letter)
+                        )
+                    )
+                    .Analyzers(an => an
+                        .Custom("ngram_analyzer", ca => ca
+                            .Tokenizer("ngram_tokenizer")
+                            .Filters("lowercase")
+                        )
+                        .Custom("standard_analyzer", sa => sa
+                            .Tokenizer("standard")
+                            .Filters("lowercase")
+                        )
+                    )
+                )
+            )
+            .Map<Product>(m => m
+                .Properties(p => p
+                    .Text(t => t
+                        .Name(n => n.ProductName)
+                        .Fields(f => f
+                            .Text(tt => tt
+                                .Name("ngram")
+                                .Analyzer("ngram_analyzer")
+                            )
+                            .Text(tt => tt
+                                .Name("standard")
+                                .Analyzer("standard_analyzer")
+                            )
+                        )
+                    )
+                    .Text(t => t
+                        .Name(n => n.Description)
+                        .Fields(f => f
+                            .Text(tt => tt
+                                .Name("ngram")
+                                .Analyzer("ngram_analyzer")
+                            )
+                            .Text(tt => tt
+                                .Name("standard")
+                                .Analyzer("standard_analyzer")
+                            )
+                        )
+                    )
+                )
+            )
+        );
+
+        if (!createIndexResponse.IsValid)
+        {
+            throw new Exception($"Failed to create index: {createIndexResponse.ServerError}");
+        }
     }
 
     private static List<Product> ReadCsv(string filePath)
     {
-        // Verilen CSV dosyasını okur ve Product nesnelerini içeren bir liste döndürür.
         using (var reader = new StreamReader(filePath))
         using (var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)))
         {
@@ -116,7 +190,6 @@ public class Program
 
     private static void IndexProducts(ElasticClient client, List<Product> products, ILogger logger)
     {
-        // Elasticsearch'e ürünleri indeksler.
         foreach (var product in products)
         {
             var response = client.IndexDocument(product);
@@ -129,7 +202,6 @@ public class Program
 
     private static void DeleteProducts(ElasticClient client, ILogger logger)
     {
-        // Elasticsearch'ten tüm ürünleri siler.
         var deleteResponse = client.DeleteByQuery<Product>(q => q
             .Query(rq => rq
                 .MatchAll()
@@ -142,44 +214,58 @@ public class Program
         }
     }
 
-    private static void SearchProducts(ElasticClient client, string searchText, ILogger logger)
-    {
-        // Verilen metinle eşleşen ürünleri Elasticsearch'te arar.
-        var searchResponse = client.Search<Product>(s => s
-            .Query(q => q
-                .MultiMatch(mm => mm
-                    .Query(searchText)
-                    .Fields(f => f
-                        .Field(p => p.ProductName, 3.0) // Ürün adına ağırlık verir.
-                        .Field(p => p.Description)     // Açıklamaya göre arar.
-                    )
-                    .Fuzziness(Fuzziness.Auto)// Otomatik bulanıklık ayarı.
+private static void SearchProducts(ElasticClient client, string searchText, ILogger logger)
+{
+    var searchResponse = client.Search<Product>(s => s
+        .Query(q => q
+            .Bool(b => b
+                .Should(
+                    sh => sh
+                        .MultiMatch(mm => mm
+                            .Query(searchText)
+                            .Fields(f => f
+                                .Field(p => p.ProductName.Suffix("ngram"))
+                                
+                            )
+                            .Fuzziness(Fuzziness.Auto)
+                        ),
+                    sh => sh
+                        .MultiMatch(mm => mm
+                            .Query(searchText)
+                            .Fields(f => f
+                                .Field(p => p.ProductName.Suffix("standard"))
+                                
+                            )
+                            .Fuzziness(Fuzziness.Auto)
+                        )
                 )
             )
-            .Sort(srt => srt
-                .Descending(SortSpecialField.Score) // Sonuçları puan sırasına göre sıralar.
-            )
-        );
+        )
+        .Sort(srt => srt
+            .Descending(SortSpecialField.Score)
+        )
+    );
 
-        if (!searchResponse.IsValid)
-        {
-            logger.LogError("Error searching products: {Reason}", searchResponse.ServerError);
-            return;
-        }
-        Console.WriteLine("Results:\n--------------------------------------------");
-        int counter = 0;
-        foreach (var product in searchResponse.Documents)
-        {
-            if (counter >= 99) { break; } // En fazla 6 ürünü yazdırması için.
-            Console.WriteLine($"Product: {product.ProductName} | Price: {product.RegularPrice} | Stock Quantity: {product.StokQuantity}\n--------------------------------------------");
-            counter++;
-        }
-        Console.WriteLine(searchResponse.Documents.Count+" matchup");
+    if (!searchResponse.IsValid)
+    {
+        logger.LogError("Error searching products: {Reason}", searchResponse.ServerError);
+        return;
     }
+
+    Console.WriteLine("Results:\n--------------------------------------------");
+    int counter = 0;
+    foreach (var product in searchResponse.Documents)
+    {
+        if (counter >= 99) { break; }
+        Console.WriteLine($"Product: {product.ProductName} | Price: {product.RegularPrice} | Stock Quantity: {product.StokQuantity}\n--------------------------------------------");
+        counter++;
+    }
+    Console.WriteLine(searchResponse.Documents.Count + " matchup");
+}
+
 
     public static void Main(string[] args)
     {
-        // Logger kurulumu
         using var loggerFactory = LoggerFactory.Create(builder =>
         {
             builder.AddConsole();
@@ -192,13 +278,13 @@ public class Program
 
         var filePath = "products50.csv"; // CSV dosyasının yolu
         var products = ReadCsv(filePath); // CSV dosyasını okur
-        
+
         var client = CreateElasticClient(); // Elasticsearch istemcisini oluşturur
 
         DeleteProducts(client, logger); // Elasticsearch'ten mevcut tüm ürünleri siler
         IndexProducts(client, products, logger); // CSV'den okunan ürünleri Elasticsearch'e indeksler
-        
-        SearchProducts(client, "içekek", logger); // Elasticsearch'te girilen kelimeyi arar
+
+        SearchProducts(client, "içe", logger); // Elasticsearch'te girilen kelimeyi arar
         stopwatch.Stop();
         Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms");
     }
