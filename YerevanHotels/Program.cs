@@ -166,12 +166,12 @@ public class Program
             logger.LogError("Error searching products: {Reason}", searchResponse.ServerError);
             return;
         }
-        Console.WriteLine("Results:\n----------------------oo----------------------");
+        Console.WriteLine("Results:\n--------------------------------------------");
         int counter = 0;
         foreach (var product in searchResponse.Documents)
         {
             if (counter >= 99) { break; } // En fazla 6 ürünü yazdırması için.
-            Console.WriteLine($"Product: {product.ProductName} | Price: {product.RegularPrice} | Stock Quantity: {product.StokQuantity}\n----------------------oo----------------------");
+            Console.WriteLine($"Product: {product.ProductName} | Price: {product.RegularPrice} | Stock Quantity: {product.StokQuantity}\n--------------------------------------------");
             counter++;
         }
         Console.WriteLine(searchResponse.Documents.Count+" matchup");
