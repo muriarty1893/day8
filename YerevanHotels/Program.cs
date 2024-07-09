@@ -75,12 +75,17 @@ public class Program
         {
             var searchResponse = client.Search<Hotel>(s => s
                 .Query(q => q
-                    .Fuzzy(fz => fz
-                        .Field(f => f.HotelName)
-                        .Value(searchText)
+                    .MultiMatch(mm => mm
+                        .Query(searchText)
+                        .Fields(f => f
+                            .Field(h => h.HotelName, 3.0) // HotelName alanına daha yüksek önem ver
+                            .Field(h => h.FreeParking)
+                        )
                         .Fuzziness(Fuzziness.Auto)
-                        //.Fuzziness(Fuzziness.EditDistance(3))
                     )
+                )
+                .Sort(srt => srt
+                    .Descending(SortSpecialField.Score) // Sonuçları alaka düzeyine göre sırala
                 )
             );
 
@@ -97,7 +102,7 @@ public class Program
         }
     }
 
-        public static void Main(string[] args)
+    public static void Main(string[] args)
     {
         var filePath = "oteller.csv";
         var hotels = ReadCsv(filePath); // CSV dosyasını oku
@@ -111,6 +116,6 @@ public class Program
         IndexHotels(client, hotels);
 
         // Otelleri ara ve sonuçları ekrana yazdır
-        SearchHotels(client, "Aeka hotel"); // ENTER THE TEXT HERE ------------------------------------------------------------------
+        SearchHotels(client, "Aeka htel"); // ENTER THE TEXT HERE ------------------------------------------------------------------
     }
 }
