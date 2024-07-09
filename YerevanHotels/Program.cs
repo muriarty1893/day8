@@ -116,6 +116,6 @@ public class Program
         IndexHotels(client, hotels);
 
         // Otelleri ara ve sonuçları ekrana yazdır
-        SearchHotels(client, "Aeka htel"); // ENTER THE TEXT HERE ------------------------------------------------------------------
+        SearchHotels(client, "Blue Toewer"); // ENTER THE TEXT HERE ------------------------------------------------------------------
     }
 }
