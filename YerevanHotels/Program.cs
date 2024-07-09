@@ -79,6 +79,7 @@ public class Program
                         .Field(f => f.HotelName)
                         .Value(searchText)
                         .Fuzziness(Fuzziness.Auto)
+                        //.Fuzziness(Fuzziness.EditDistance(3))
                     )
                 )
             );
@@ -110,6 +111,6 @@ public class Program
         IndexHotels(client, hotels);
 
         // Otelleri ara ve sonuçları ekrana yazdır
-        SearchHotels(client, "Sweet"); // ENTER THE TEXT HERE ------------------------------------------------------------------
+        SearchHotels(client, "Aeka hotel"); // ENTER THE TEXT HERE ------------------------------------------------------------------
     }
 }
