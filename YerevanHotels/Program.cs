@@ -6,7 +6,9 @@ using System.IO;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Nest;
-
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
+using Microsoft.Extensions.Logging.Debug;
 public class Product
 {
     public double? ProductId { get; set; }
@@ -91,7 +93,6 @@ public class ProductMap : ClassMap<Product>
         Map(m => m.PurchasePrice).Name("purchasePrice");
     }
 }
-
 public class Program
 {
     private static ElasticClient CreateElasticClient()
@@ -113,7 +114,7 @@ public class Program
         }
     }
 
-    private static void IndexProducts(ElasticClient client, List<Product> products)
+    private static void IndexProducts(ElasticClient client, List<Product> products, ILogger logger)
     {
         // Elasticsearch'e ürünleri indeksler.
         foreach (var product in products)
@@ -121,12 +122,12 @@ public class Program
             var response = client.IndexDocument(product);
             if (!response.IsValid)
             {
-                Console.WriteLine($"Error indexing product: {product.ProductName}, Reason: {response.ServerError}");
+                logger.LogError($"Error indexing product: {product.ProductName}, Reason: {response.ServerError}");
             }
         }
     }
 
-    private static void DeleteProducts(ElasticClient client)
+    private static void DeleteProducts(ElasticClient client, ILogger logger)
     {
         // Elasticsearch'ten tüm ürünleri siler.
         var deleteResponse = client.DeleteByQuery<Product>(q => q
@@ -134,11 +135,15 @@ public class Program
                 .MatchAll()
             )
         );
+
+        if (!deleteResponse.IsValid)
+        {
+            logger.LogError("Error deleting products: {Reason}", deleteResponse.ServerError);
+        }
     }
 
-    private static void SearchProducts(ElasticClient client, string searchText)
+    private static void SearchProducts(ElasticClient client, string searchText, ILogger logger)
     {
-    
         // Verilen metinle eşleşen ürünleri Elasticsearch'te arar.
         var searchResponse = client.Search<Product>(s => s
             .Query(q => q
@@ -156,6 +161,12 @@ public class Program
             )
         );
 
+        if (!searchResponse.IsValid)
+        {
+            logger.LogError("Error searching products: {Reason}", searchResponse.ServerError);
+            return;
+        }
+
         int counter = 0;
         foreach (var product in searchResponse.Documents)
         {
@@ -163,11 +174,18 @@ public class Program
             Console.WriteLine($"Product: {product.ProductName},\nPrice: {product.RegularPrice},\nStock Quantity: {product.StokQuantity}");
             counter++;
         }
-
     }
 
     public static void Main(string[] args)
     {
+        // Logger kurulumu
+        using var loggerFactory = LoggerFactory.Create(builder =>
+        {
+            builder.AddConsole();
+            builder.AddDebug();
+        });
+        var logger = loggerFactory.CreateLogger<Program>();
+
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();
 
@@ -176,12 +194,11 @@ public class Program
         
         var client = CreateElasticClient(); // Elasticsearch istemcisini oluşturur
 
-        DeleteProducts(client); // Elasticsearch'ten mevcut tüm ürünleri siler
-        IndexProducts(client, products); // CSV'den okunan ürünleri Elasticsearch'e indeksler
+        DeleteProducts(client, logger); // Elasticsearch'ten mevcut tüm ürünleri siler
+        IndexProducts(client, products, logger); // CSV'den okunan ürünleri Elasticsearch'e indeksler
         
-        SearchProducts(client, "toz"); // Elasticsearch'te girilen kelimeyi arar -------------------------------------------------------------
+        SearchProducts(client, "toz", logger); // Elasticsearch'te girilen kelimeyi arar
         stopwatch.Stop();
         Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms");
-
     }
 }
