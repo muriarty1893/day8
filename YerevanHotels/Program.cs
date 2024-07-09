@@ -166,14 +166,15 @@ public class Program
             logger.LogError("Error searching products: {Reason}", searchResponse.ServerError);
             return;
         }
-
-        int counter = 0;
+        Console.WriteLine("Results:\n----------------------oo----------------------");
+        //int counter = 0;
         foreach (var product in searchResponse.Documents)
         {
-            if (counter >= 6) { break; } // En fazla 6 ürünü yazdırması için.
-            Console.WriteLine($"Product: {product.ProductName},\nPrice: {product.RegularPrice},\nStock Quantity: {product.StokQuantity}");
-            counter++;
+            //if (counter >= 6) { break; } // En fazla 6 ürünü yazdırması için.
+            Console.WriteLine($"Product: {product.ProductName} | Price: {product.RegularPrice} | Stock Quantity: {product.StokQuantity}\n----------------------oo----------------------");
+            //counter++;
         }
+        Console.WriteLine(searchResponse.Documents.Count+" matchup");
     }
 
     public static void Main(string[] args)
@@ -197,7 +198,7 @@ public class Program
         DeleteProducts(client, logger); // Elasticsearch'ten mevcut tüm ürünleri siler
         IndexProducts(client, products, logger); // CSV'den okunan ürünleri Elasticsearch'e indeksler
         
-        SearchProducts(client, "toz", logger); // Elasticsearch'te girilen kelimeyi arar
+        SearchProducts(client, "su", logger); // Elasticsearch'te girilen kelimeyi arar
         stopwatch.Stop();
         Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms");
     }
