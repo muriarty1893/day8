@@ -153,7 +153,7 @@ public class Program
                         .Field(p => p.ProductName, 3.0) // Ürün adına ağırlık verir.
                         .Field(p => p.Description)     // Açıklamaya göre arar.
                     )
-                    .Fuzziness(Fuzziness.Auto)       // Otomatik bulanıklık ayarı.
+                    .Fuzziness(Fuzziness.Auto)// Otomatik bulanıklık ayarı.
                 )
             )
             .Sort(srt => srt
@@ -198,7 +198,7 @@ public class Program
         DeleteProducts(client, logger); // Elasticsearch'ten mevcut tüm ürünleri siler
         IndexProducts(client, products, logger); // CSV'den okunan ürünleri Elasticsearch'e indeksler
         
-        SearchProducts(client, "su", logger); // Elasticsearch'te girilen kelimeyi arar
+        SearchProducts(client, "içekek", logger); // Elasticsearch'te girilen kelimeyi arar
         stopwatch.Stop();
         Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms");
     }
