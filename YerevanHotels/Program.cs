@@ -167,12 +167,12 @@ public class Program
             return;
         }
         Console.WriteLine("Results:\n----------------------oo----------------------");
-        //int counter = 0;
+        int counter = 0;
         foreach (var product in searchResponse.Documents)
         {
-            //if (counter >= 6) { break; } // En fazla 6 ürünü yazdırması için.
+            if (counter >= 99) { break; } // En fazla 6 ürünü yazdırması için.
             Console.WriteLine($"Product: {product.ProductName} | Price: {product.RegularPrice} | Stock Quantity: {product.StokQuantity}\n----------------------oo----------------------");
-            //counter++;
+            counter++;
         }
         Console.WriteLine(searchResponse.Documents.Count+" matchup");
     }
