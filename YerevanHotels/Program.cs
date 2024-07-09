@@ -96,6 +96,7 @@ public class Program
 {
     private static ElasticClient CreateElasticClient()
     {
+        // Elasticsearch bağlantı ayarlarını yapılandırır ve bir ElasticClient döndürür.
         var settings = new ConnectionSettings(new Uri("http://localhost:9200"))
             .DefaultIndex("products");
         return new ElasticClient(settings);
@@ -103,6 +104,7 @@ public class Program
 
     private static List<Product> ReadCsv(string filePath)
     {
+        // Verilen CSV dosyasını okur ve Product nesnelerini içeren bir liste döndürür.
         using (var reader = new StreamReader(filePath))
         using (var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)))
         {
@@ -113,6 +115,7 @@ public class Program
 
     private static void IndexProducts(ElasticClient client, List<Product> products)
     {
+        // Elasticsearch'e ürünleri indeksler.
         foreach (var product in products)
         {
             var response = client.IndexDocument(product);
@@ -125,6 +128,7 @@ public class Program
 
     private static void DeleteProducts(ElasticClient client)
     {
+        // Elasticsearch'ten tüm ürünleri siler.
         var deleteResponse = client.DeleteByQuery<Product>(q => q
             .Query(rq => rq
                 .MatchAll()
@@ -139,19 +143,20 @@ public class Program
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
+            // Verilen metinle eşleşen ürünleri Elasticsearch'te arar.
             var searchResponse = client.Search<Product>(s => s
                 .Query(q => q
                     .MultiMatch(mm => mm
                         .Query(searchText)
                         .Fields(f => f
-                            .Field(p => p.ProductName, 3.0)
-                            .Field(p => p.Description)
+                            .Field(p => p.ProductName, 3.0) // Ürün adına ağırlık verir.
+                            .Field(p => p.Description)     // Açıklamaya göre arar.
                         )
-                        .Fuzziness(Fuzziness.Auto)
+                        .Fuzziness(Fuzziness.Auto)       // Otomatik bulanıklık ayarı.
                     )
                 )
                 .Sort(srt => srt
-                    .Descending(SortSpecialField.Score)
+                    .Descending(SortSpecialField.Score) // Sonuçları puan sırasına göre sıralar.
                 )
             );
 
@@ -161,7 +166,7 @@ public class Program
             int counter = 0;
             foreach (var product in searchResponse.Documents)
             {
-                if (counter >= 6) { break; }
+                if (counter >= 6) { break; } // En fazla 6 ürünü yazdırır.
                 Console.WriteLine($"Product: {product.ProductName},\nPrice: {product.RegularPrice},\nStock Quantity: {product.StokQuantity}");
                 counter++;
             }
@@ -176,15 +181,15 @@ public class Program
 
     public static void Main(string[] args)
     {
-        var filePath = "products50.csv";
-        var products = ReadCsv(filePath);
+        var filePath = "products50.csv"; // CSV dosyasının yolu
+        var products = ReadCsv(filePath); // CSV dosyasını okur
 
-        var client = CreateElasticClient();
+        var client = CreateElasticClient(); // Elasticsearch istemcisini oluşturur
 
-        DeleteProducts(client);
+        DeleteProducts(client); // Elasticsearch'ten mevcut tüm ürünleri siler
 
-        IndexProducts(client, products);
+        IndexProducts(client, products); // CSV'den okunan ürünleri Elasticsearch'e indeksler
 
-        SearchProducts(client, "PORTAKAL"); // ENTER THE TEXT HERE
+        SearchProducts(client, "PORTAKAL"); // Elasticsearch'te girilen kelimeyi arar -------------------------------------------------------------
     }
 }
