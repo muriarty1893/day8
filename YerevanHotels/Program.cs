@@ -9,30 +9,30 @@ using Nest;
 
 public class Product
 {
-    public int? ProductId { get; set; }
+    public double? ProductId { get; set; }
     public string? ProductName { get; set; }
     public string? StockCode { get; set; }
-    public int? StockUnit { get; set; }
+    public double? StockUnit { get; set; }
     public DateTime? CreatedDate { get; set; }
     public DateTime? ReleaseDate { get; set; }
     public string? ProductJson { get; set; }
-    public int? ProductStateId { get; set; }
+    public double? ProductStateId { get; set; }
     public string? Barcode { get; set; }
     public bool? FlagStockOption { get; set; }
-    public int? StockLimitId { get; set; }
-    public int? ProductSizeId { get; set; }
+    public double? StockLimitId { get; set; }
+    public double? ProductSizeId { get; set; }
     public string? Description { get; set; }
     public string? ShortDescription { get; set; }
     public bool? FlagPriceOption { get; set; }
     public string? ProductContent { get; set; }
-    public int? ProductTypeId { get; set; }
-    public int? MetaId { get; set; }
+    public double? ProductTypeId { get; set; }
+    public double? MetaId { get; set; }
     public string? ImportName { get; set; }
-    public int? TaxId { get; set; }
+    public double? TaxId { get; set; }
     public string? SerialNo { get; set; }
-    public int? ProductBranchId { get; set; }
-    public int? CompanyId { get; set; }
-    public int? StokQuantity { get; set; }
+    public double? ProductBranchId { get; set; }
+    public double? CompanyId { get; set; }
+    public double? StokQuantity { get; set; }
     public decimal? TaxTotal { get; set; }
     public decimal? ItemPrice { get; set; }
     public decimal? RegularPrice { get; set; }
@@ -44,7 +44,7 @@ public class Product
     public bool? FlagOnStock { get; set; }
     public bool? FlagActive { get; set; }
     public bool? FlagLock { get; set; }
-    public int? CurrencyId { get; set; }
+    public double? CurrencyId { get; set; }
     public decimal? PurchasePrice { get; set; }
 }
 
