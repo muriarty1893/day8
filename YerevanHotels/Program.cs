@@ -181,17 +181,18 @@ public class Program
 
     public static void Main(string[] args)
     {
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+
         var filePath = "products50.csv"; // CSV dosyasının yolu
         var products = ReadCsv(filePath); // CSV dosyasını okur
-
+        
         var client = CreateElasticClient(); // Elasticsearch istemcisini oluşturur
 
         DeleteProducts(client); // Elasticsearch'ten mevcut tüm ürünleri siler
-
         IndexProducts(client, products); // CSV'den okunan ürünleri Elasticsearch'e indeksler
         
-        Stopwatch stopwatch = new Stopwatch();
-        stopwatch.Start();
+        
         SearchProducts(client, "PORTAKAL"); // Elasticsearch'te girilen kelimeyi arar -------------------------------------------------------------
         stopwatch.Stop();
         Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms");
