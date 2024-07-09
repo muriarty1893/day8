@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using CsvHelper;
@@ -73,6 +74,9 @@ public class Program
     {
         try
         {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             var searchResponse = client.Search<Hotel>(s => s
                 .Query(q => q
                     .MultiMatch(mm => mm
@@ -88,6 +92,9 @@ public class Program
                     .Descending(SortSpecialField.Score) // Sonuçları alaka düzeyine göre sırala
                 )
             );
+
+            stopwatch.Stop();
+            Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms");
 
             foreach (var hotel in searchResponse.Documents)
             {
@@ -116,6 +123,6 @@ public class Program
         IndexHotels(client, hotels);
 
         // Otelleri ara ve sonuçları ekrana yazdır
-        SearchHotels(client, "Blue Toewer"); // ENTER THE TEXT HERE ------------------------------------------------------------------
+        SearchHotels(client, "Blue Tower"); // ENTER THE TEXT HERE ------------------------------------------------------------------
     }
 }
