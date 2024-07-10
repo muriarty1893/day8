@@ -188,17 +188,16 @@ public class Program
         var logger = loggerFactory.CreateLogger<Program>();
 
         Stopwatch stopwatch = new Stopwatch();
-        stopwatch.Start();
-
-        var filePath = "products50.csv"; // CSV dosyasının yolu
+        
+        var filePath = "products50.csv"; // CSV dosyasının yolu // ------------------------------------------------------------------ değişecek yer 1
         var products = ReadCsv(filePath); // CSV dosyasını okur
         
         var client = CreateElasticClient(); // Elasticsearch istemcisini oluşturur
 
         DeleteProducts(client, logger); // Elasticsearch'ten mevcut tüm ürünleri siler
         IndexProducts(client, products, logger); // CSV'den okunan ürünleri Elasticsearch'e indeksler
-        
-        SearchProducts(client, "içecek", logger); // Elasticsearch'te girilen kelimeyi arar
+        stopwatch.Start();
+        SearchProducts(client, "içecec", logger); // Elasticsearch'te girilen kelimeyi arar
         stopwatch.Stop();
         Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms");
     }
