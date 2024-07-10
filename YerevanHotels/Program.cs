@@ -9,6 +9,7 @@ using Nest;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Logging.Debug;
+
 public class Product
 {
     public double? ProductId { get; set; }
@@ -93,6 +94,7 @@ public class ProductMap : ClassMap<Product>
         Map(m => m.PurchasePrice).Name("purchasePrice");
     }
 }
+
 public class Program
 {
     private static ElasticClient CreateElasticClient()
@@ -127,18 +129,20 @@ public class Program
         }
     }
 
-    private static void DeleteProducts(ElasticClient client, ILogger logger)
+    private static void CreateIndexIfNotExists(ElasticClient client, ILogger logger)
     {
-        // Elasticsearch'ten tüm ürünleri siler.
-        var deleteResponse = client.DeleteByQuery<Product>(q => q
-            .Query(rq => rq
-                .MatchAll()
-            )
-        );
-
-        if (!deleteResponse.IsValid)
+        // Elasticsearch'te indexin var olup olmadığını kontrol eder, yoksa oluşturur.
+        var indexExistsResponse = client.Indices.Exists("products");
+        if (!indexExistsResponse.Exists)
         {
-            logger.LogError("Error deleting products: {Reason}", deleteResponse.ServerError);
+            var createIndexResponse = client.Indices.Create("products", c => c
+                .Map<Product>(m => m.AutoMap())
+            );
+
+            if (!createIndexResponse.IsValid)
+            {
+                logger.LogError("Error creating index: {Reason}", createIndexResponse.ServerError);
+            }
         }
     }
 
@@ -175,7 +179,7 @@ public class Program
             Console.WriteLine($"Product: {product.ProductName} | Price: {product.RegularPrice} | Stock Quantity: {product.StokQuantity}\n--------------------------------------------");
             counter++;
         }
-        Console.WriteLine(searchResponse.Documents.Count+" matchup");
+        Console.WriteLine(searchResponse.Documents.Count + " matchup");
     }
 
     public static void Main(string[] args)
@@ -193,13 +197,13 @@ public class Program
         var products = ReadCsv(filePath); // CSV dosyasını okur
         var client = CreateElasticClient(); // Elasticsearch istemcisini oluşturur
 
-        DeleteProducts(client, logger); // Elasticsearch'ten mevcut tüm ürünleri siler
+        CreateIndexIfNotExists(client, logger); // Elasticsearch'te index varsa kontrol eder, yoksa oluşturur
         IndexProducts(client, products, logger); // CSV'den okunan ürünleri Elasticsearch'e indeksler
 
         stopwatch.Start();
-        SearchProducts(client, "içecek", logger); // Elasticsearch'te girilen kelimeyi arar
+        SearchProducts(client, "içecec", logger); // Elasticsearch'te girilen kelimeyi arar
         stopwatch.Stop();
 
-        Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms");
+        Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms.");
     }
 }
