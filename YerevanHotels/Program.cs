@@ -155,7 +155,7 @@ public class Program
                     .Query(searchText)
                     .Fields(f => f
                         .Field(p => p.ProductName, 3.0) // Ürün adına ağırlık verir.
-                        .Field(p => p.Description)     // Açıklamaya göre arar.
+                        //.Field(p => p.Description)     // Açıklamaya göre arar.
                     )
                     .Fuzziness(Fuzziness.Auto)// Otomatik bulanıklık ayarı.
                 )
@@ -171,8 +171,8 @@ public class Program
             return;
         }
         Console.WriteLine("Results:\n--------------------------------------------");
-        int counter = 0;
-        int x = 5;
+        int counter = 0; // 
+        int x = 5; // çıktıda gösterilecek sonuç sayısı
         foreach (var product in searchResponse.Documents)
         {
             if (counter >= x) { break; } // En fazla x ürünü yazdırması için.
