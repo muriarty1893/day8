@@ -199,9 +199,10 @@ public class Program
 
         CreateIndexIfNotExists(client, logger); // Elasticsearch'te index varsa kontrol eder, yoksa oluşturur
         IndexProducts(client, products, logger); // CSV'den okunan ürünleri Elasticsearch'e indeksler
-
+        //Console.WriteLine("input :");
+        //string theitem = Console.ReadLine();
         stopwatch.Start();
-        SearchProducts(client, "içecek", logger); // Elasticsearch'te girilen kelimeyi arar
+        SearchProducts(client,"içecec", logger); // Elasticsearch'te girilen kelimeyi arar
         stopwatch.Stop();
 
         Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms.");
