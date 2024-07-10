@@ -3,134 +3,116 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Nest;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Logging.Debug;
-public class Product
+
+public class ElectricVehicle
 {
-    public double? ProductId { get; set; }
-    public string? ProductName { get; set; }
-    public string? StockCode { get; set; }
-    public double? StockUnit { get; set; }
-    public DateTime? CreatedDate { get; set; }
-    public DateTime? ReleaseDate { get; set; }
-    public string? ProductJson { get; set; }
-    public double? ProductStateId { get; set; }
-    public string? Barcode { get; set; }
-    public bool? FlagStockOption { get; set; }
-    public double? StockLimitId { get; set; }
-    public double? ProductSizeId { get; set; }
-    public string? Description { get; set; }
-    public string? ShortDescription { get; set; }
-    public bool? FlagPriceOption { get; set; }
-    public string? ProductContent { get; set; }
-    public double? ProductTypeId { get; set; }
-    public double? MetaId { get; set; }
-    public string? ImportName { get; set; }
-    public double? TaxId { get; set; }
-    public string? SerialNo { get; set; }
-    public double? ProductBranchId { get; set; }
-    public double? CompanyId { get; set; }
-    public double? StokQuantity { get; set; }
-    public decimal? TaxTotal { get; set; }
-    public decimal? ItemPrice { get; set; }
-    public decimal? RegularPrice { get; set; }
-    public bool? SaleFlag { get; set; }
-    public decimal? OldPrice { get; set; }
-    public bool? FlagStockManage { get; set; }
-    public string? SaleTag { get; set; }
-    public bool? FlagStockOnline { get; set; }
-    public bool? FlagOnStock { get; set; }
-    public bool? FlagActive { get; set; }
-    public bool? FlagLock { get; set; }
-    public double? CurrencyId { get; set; }
-    public decimal? PurchasePrice { get; set; }
+    public string? VIN { get; set; }
+    public string? County { get; set; }
+    public string? City { get; set; }
+    public string? State { get; set; }
+    public string? PostalCode { get; set; }
+    public int? ModelYear { get; set; }
+    public string? Make { get; set; }
+    public string? Model { get; set; }
+    public string? ElectricVehicleType { get; set; }
+    public string? CAFVEligibility { get; set; }
+    public int? ElectricRange { get; set; }
+    public double? BaseMSRP { get; set; }
+    public int? LegislativeDistrict { get; set; }
+    public long? DOLVehicleID { get; set; }
+    public string? VehicleLocation { get; set; }
+    public string? ElectricUtility { get; set; }
+    public long? CensusTract { get; set; }
 }
 
-public class ProductMap : ClassMap<Product>
+public class ElectricVehicleMap : ClassMap<ElectricVehicle>
 {
-    public ProductMap()
+    public ElectricVehicleMap()
     {
-        Map(m => m.ProductId).Name("productId");
-        Map(m => m.ProductName).Name("productName");
-        Map(m => m.StockCode).Name("stockCode");
-        Map(m => m.StockUnit).Name("stockUnit");
-        Map(m => m.CreatedDate).Name("createdDate");
-        Map(m => m.ReleaseDate).Name("releaseDate");
-        Map(m => m.ProductJson).Name("productJson");
-        Map(m => m.ProductStateId).Name("productStateId");
-        Map(m => m.Barcode).Name("barcode");
-        Map(m => m.FlagStockOption).Name("flagStockOption");
-        Map(m => m.StockLimitId).Name("stockLimitId");
-        Map(m => m.ProductSizeId).Name("productSizeId");
-        Map(m => m.Description).Name("description");
-        Map(m => m.ShortDescription).Name("shortDescription");
-        Map(m => m.FlagPriceOption).Name("flagPriceOption");
-        Map(m => m.ProductContent).Name("productContent");
-        Map(m => m.ProductTypeId).Name("productTypeId");
-        Map(m => m.MetaId).Name("metaId");
-        Map(m => m.ImportName).Name("importName");
-        Map(m => m.TaxId).Name("taxId");
-        Map(m => m.SerialNo).Name("serialNo");
-        Map(m => m.ProductBranchId).Name("productBranchId");
-        Map(m => m.CompanyId).Name("companyId");
-        Map(m => m.StokQuantity).Name("stokQuantity");
-        Map(m => m.TaxTotal).Name("taxTotal");
-        Map(m => m.ItemPrice).Name("itemPrice");
-        Map(m => m.RegularPrice).Name("regularPrice");
-        Map(m => m.SaleFlag).Name("saleFlag");
-        Map(m => m.OldPrice).Name("oldPrice");
-        Map(m => m.FlagStockManage).Name("flagStockManage");
-        Map(m => m.SaleTag).Name("saleTag");
-        Map(m => m.FlagStockOnline).Name("flagStockOnline");
-        Map(m => m.FlagOnStock).Name("flagOnStock");
-        Map(m => m.FlagActive).Name("flagActive");
-        Map(m => m.FlagLock).Name("flagLock");
-        Map(m => m.CurrencyId).Name("currencyId");
-        Map(m => m.PurchasePrice).Name("purchasePrice");
+        Map(m => m.VIN).Name("VIN (1-10)");
+        Map(m => m.County).Name("County");
+        Map(m => m.City).Name("City");
+        Map(m => m.State).Name("State");
+        Map(m => m.PostalCode).Name("Postal Code");
+        Map(m => m.ModelYear).Name("Model Year");
+        Map(m => m.Make).Name("Make");
+        Map(m => m.Model).Name("Model");
+        Map(m => m.ElectricVehicleType).Name("Electric Vehicle Type");
+        Map(m => m.CAFVEligibility).Name("Clean Alternative Fuel Vehicle (CAFV) Eligibility");
+        Map(m => m.ElectricRange).Name("Electric Range");
+        Map(m => m.BaseMSRP).Name("Base MSRP");
+        Map(m => m.LegislativeDistrict).Name("Legislative District");
+        Map(m => m.DOLVehicleID).Name("DOL Vehicle ID");
+        Map(m => m.VehicleLocation).Name("Vehicle Location");
+        Map(m => m.ElectricUtility).Name("Electric Utility");
+        Map(m => m.CensusTract).Name("2020 Census Tract");
     }
 }
+
 public class Program
 {
     private static ElasticClient CreateElasticClient()
     {
-        // Elasticsearch bağlantı ayarlarını yapılandırır ve bir ElasticClient döndürür.
         var settings = new ConnectionSettings(new Uri("http://localhost:9200"))
-            .DefaultIndex("products");
+            .DefaultIndex("electric_vehicles");
         return new ElasticClient(settings);
     }
 
-    private static List<Product> ReadCsv(string filePath)
+    private static List<ElectricVehicle> ReadCsv(string filePath)
     {
-        // Verilen CSV dosyasını okur ve Product nesnelerini içeren bir liste döndürür.
         using (var reader = new StreamReader(filePath))
         using (var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)))
         {
-            csv.Context.RegisterClassMap<ProductMap>();
-            return new List<Product>(csv.GetRecords<Product>());
+            csv.Context.RegisterClassMap<ElectricVehicleMap>();
+            return new List<ElectricVehicle>(csv.GetRecords<ElectricVehicle>());
         }
     }
 
-    private static void IndexProducts(ElasticClient client, List<Product> products, ILogger logger)
+    private static void IndexElectricVehiclesBulk(ElasticClient client, List<ElectricVehicle> vehicles, ILogger logger)
     {
-        // Elasticsearch'e ürünleri indeksler.
-        foreach (var product in products)
+        const int batchSize = 100; // Her bir bulk isteğinde gönderilecek belge sayısı
+        var totalBatches = (vehicles.Count + batchSize - 1) / batchSize;
+
+        Parallel.For(0, totalBatches, i =>
         {
-            var response = client.IndexDocument(product);
-            if (!response.IsValid)
+            try
             {
-                logger.LogError($"Error indexing product: {product.ProductName}, Reason: {response.ServerError}");
+                var batch = vehicles.Skip(i * batchSize).Take(batchSize).ToList();
+                if (batch == null || !batch.Any())
+                {
+                    logger.LogError($"Batch {i + 1}/{totalBatches} is null or empty");
+                    return;
+                }
+
+                var bulkIndexResponse = client.Bulk(b => b.IndexMany(batch));
+
+                if (!bulkIndexResponse.IsValid)
+                {
+                    logger.LogError($"Error indexing batch {i + 1}/{totalBatches}, Reason: {bulkIndexResponse.ServerError}");
+                    foreach (var itemWithError in bulkIndexResponse.ItemsWithErrors)
+                    {
+                        logger.LogError($"Failed item: {itemWithError.Error.Reason}");
+                    }
+                }
             }
-        }
+            catch (Exception ex)
+            {
+                logger.LogError($"Exception in batch {i + 1}/{totalBatches}: {ex.Message}");
+            }
+        });
     }
 
-    private static void DeleteProducts(ElasticClient client, ILogger logger)
+    private static void DeleteElectricVehicles(ElasticClient client, ILogger logger)
     {
-        // Elasticsearch'ten tüm ürünleri siler.
-        var deleteResponse = client.DeleteByQuery<Product>(q => q
+        var deleteResponse = client.DeleteByQuery<ElectricVehicle>(q => q
             .Query(rq => rq
                 .MatchAll()
             )
@@ -138,22 +120,20 @@ public class Program
 
         if (!deleteResponse.IsValid)
         {
-            logger.LogError("Error deleting products: {Reason}", deleteResponse.ServerError);
+            logger.LogError("Error deleting vehicles: {Reason}", deleteResponse.ServerError);
         }
     }
 
-    private static void SearchProducts(ElasticClient client, string searchText, ILogger logger)
+    private static void SearchElectricVehicles(ElasticClient client, string searchText, ILogger logger)
     {
-        // Verilen metinle eşleşen ürünleri Elasticsearch'te arar.
-        var searchResponse = client.Search<Product>(s => s
+        var searchResponse = client.Search<ElectricVehicle>(s => s
             .Query(q => q
                 .MultiMatch(mm => mm
                     .Query(searchText)
                     .Fields(f => f
-                        .Field(p => p.ProductName, 3.0) // Ürün adına ağırlık verir.
-                        .Field(p => p.Description)     // Açıklamaya göre arar.
+                        .Field(p => p.Model)     // Modele göre arar.
                     )
-                    .Fuzziness(Fuzziness.Auto)// Otomatik bulanıklık ayarı.
+                    .Fuzziness(Fuzziness.Auto) // Otomatik bulanıklık ayarı.
                 )
             )
             .Sort(srt => srt
@@ -163,42 +143,52 @@ public class Program
 
         if (!searchResponse.IsValid)
         {
-            logger.LogError("Error searching products: {Reason}", searchResponse.ServerError);
+            logger.LogError("Error searching vehicles: {Reason}", searchResponse.ServerError);
             return;
         }
         Console.WriteLine("Results:\n--------------------------------------------");
         int counter = 0;
-        foreach (var product in searchResponse.Documents)
+        foreach (var vehicle in searchResponse.Documents)
         {
-            if (counter >= 99) { break; } // En fazla 6 ürünü yazdırması için.
-            Console.WriteLine($"Product: {product.ProductName} | Price: {product.RegularPrice} | Stock Quantity: {product.StokQuantity}\n--------------------------------------------");
+            if (counter >= 3) { break; } // En fazla 5 aracı yazdırır.
+            Console.WriteLine($"Make: {vehicle.Make} | Model: {vehicle.Model} | Range: {vehicle.ElectricRange}\n--------------------------------------------");
             counter++;
         }
-        Console.WriteLine(searchResponse.Documents.Count+" matchup");
+        Console.WriteLine(searchResponse.Documents.Count + " match(es) found");
     }
 
     public static void Main(string[] args)
     {
-        // Logger kurulumu
-        using var loggerFactory = LoggerFactory.Create(builder =>
-        {
-            builder.AddConsole();
-            builder.AddDebug();
-        });
-        var logger = loggerFactory.CreateLogger<Program>();
+    using var loggerFactory = LoggerFactory.Create(builder =>
+    {
+        builder.AddConsole();
+        builder.AddDebug();
+    });
+    var logger = loggerFactory.CreateLogger<Program>();
 
-        Stopwatch stopwatch = new Stopwatch();
-        
-        var filePath = "products50.csv"; // CSV dosyasının yolu // ------------------------------------------------------------------ değişecek yer 1
-        var products = ReadCsv(filePath); // CSV dosyasını okur
-        
-        var client = CreateElasticClient(); // Elasticsearch istemcisini oluşturur
+    var filePath = "Electric_Vehicle_Population_Data.csv"; // CSV dosyasının yolu
+    Stopwatch stopwatch2 = new Stopwatch();
+    Stopwatch stopwatch1 = new Stopwatch();
+    stopwatch2.Start();
 
-        DeleteProducts(client, logger); // Elasticsearch'ten mevcut tüm ürünleri siler
-        IndexProducts(client, products, logger); // CSV'den okunan ürünleri Elasticsearch'e indeksler
-        stopwatch.Start();
-        SearchProducts(client, "içecec", logger); // Elasticsearch'te girilen kelimeyi arar
-        stopwatch.Stop();
-        Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms");
+    var vehicles = ReadCsv(filePath); // CSV dosyasını okur  
+    if (vehicles == null || !vehicles.Any())
+    {
+        logger.LogError("No vehicles read from CSV");
+        return;
+    }
+
+    var client = CreateElasticClient(); // Elasticsearch istemcisini oluşturur
+
+    DeleteElectricVehicles(client, logger); // Elasticsearch'ten mevcut tüm araçları siler
+    IndexElectricVehiclesBulk(client, vehicles, logger); // CSV'den okunan araçları Elasticsearch'e bulk indeksler
+    
+    stopwatch1.Start();
+    SearchElectricVehicles(client, "330E", logger); // Elasticsearch'te girilen kelimeyi arar
+    stopwatch1.Stop();
+    stopwatch2.Stop();
+
+    Console.WriteLine($"Search completed in {stopwatch1.ElapsedMilliseconds} ms");
+    Console.WriteLine($"Whole operation completed in {stopwatch2.ElapsedMilliseconds} ms");
     }
 }
