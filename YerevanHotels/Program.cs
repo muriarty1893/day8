@@ -168,9 +168,10 @@ public class Program
         }
         Console.WriteLine("Results:\n--------------------------------------------");
         int counter = 0;
+        int x = 5;
         foreach (var product in searchResponse.Documents)
         {
-            if (counter >= 99) { break; } // En fazla 6 ürünü yazdırması için.
+            if (counter >= x) { break; } // En fazla x ürünü yazdırması için.
             Console.WriteLine($"Product: {product.ProductName} | Price: {product.RegularPrice} | Stock Quantity: {product.StokQuantity}\n--------------------------------------------");
             counter++;
         }
@@ -187,19 +188,18 @@ public class Program
         });
         var logger = loggerFactory.CreateLogger<Program>();
 
-        Stopwatch stopwatch = new Stopwatch();
-        stopwatch.Start();
-
-        var filePath = "products50.csv"; // CSV dosyasının yolu
+        Stopwatch stopwatch = new Stopwatch(); //Zamanlayıcı oluşturur
+        var filePath = "products50_extended.csv"; // CSV dosyasının yolu
         var products = ReadCsv(filePath); // CSV dosyasını okur
-        
         var client = CreateElasticClient(); // Elasticsearch istemcisini oluşturur
 
         DeleteProducts(client, logger); // Elasticsearch'ten mevcut tüm ürünleri siler
         IndexProducts(client, products, logger); // CSV'den okunan ürünleri Elasticsearch'e indeksler
-        
+
+        stopwatch.Start();
         SearchProducts(client, "içecek", logger); // Elasticsearch'te girilen kelimeyi arar
         stopwatch.Stop();
+
         Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms");
     }
 }
