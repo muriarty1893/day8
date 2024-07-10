@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("YerevanHotels")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b12e3d5abc477cde38aafdceaadb2f2d35a9ff30")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ac31dd8413d2c1ad8475711a80fc66a010cdd717")]
 [assembly: System.Reflection.AssemblyProductAttribute("YerevanHotels")]
 [assembly: System.Reflection.AssemblyTitleAttribute("YerevanHotels")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
