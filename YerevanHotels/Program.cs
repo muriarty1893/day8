@@ -201,7 +201,7 @@ public class Program
         IndexProducts(client, products, logger); // CSV'den okunan ürünleri Elasticsearch'e indeksler
 
         stopwatch.Start();
-        SearchProducts(client, "içecec", logger); // Elasticsearch'te girilen kelimeyi arar
+        SearchProducts(client, "içecek", logger); // Elasticsearch'te girilen kelimeyi arar
         stopwatch.Stop();
 
         Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms.");
