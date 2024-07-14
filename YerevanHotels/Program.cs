@@ -202,7 +202,7 @@ public class Program
         //Console.WriteLine("input :");
         //string theitem = Console.ReadLine();
         stopwatch.Start();
-        SearchProducts(client,"içecec", logger); // Elasticsearch'te girilen kelimeyi arar
+        SearchProducts(client,"icecek", logger); // Elasticsearch'te girilen kelimeyi arar
         stopwatch.Stop();
 
         Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms.");
